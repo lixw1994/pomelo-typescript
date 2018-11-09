@@ -1,9 +1,19 @@
-declare module pomelo {    
+// declare module pomelo {    
+
+    type DIYCallBack = (err: null | Error, result: any) => void;
+    type DIYFunction = (...params: any[]) => any;
+    type DIYMsg = object | string;
+    interface DIYComponent {
+        start?: DIYFunction;
+        afterStart?: DIYFunction;
+        stop?: DIYFunction;
+        [propName: string]: any;
+    }
     
     /**
      * Application
      */
-    export class Application {
+    export interface Application {
         /**
          * Get application base path
          *
@@ -19,87 +29,87 @@ declare module pomelo {
         /**
          * add a filter to before and after filter
          *
-         * @param {Object} filter provide before and after filter method.
+         * @param {object} filter provide before and after filter method.
          *                        A filter should have two methods: before and after.         
          */
-        filter(filter: Object): void;
+        filter(filter: object): void;
         
         /**
          * Add before filter.
          *
-         * @param {Object|Function} bf before fileter, bf(msg, session, next)
+         * @param {object|Function} bf before fileter, bf(msg, session, next)
          */
-        before(bf: Object | ((msg, session, next) => any)): void;
+        before(bf: object | ((msg: DIYMsg, session: FrontendSession, next: DIYCallBack) => any)): void;
         
         /**
          * Add after filter.
          *
-         * @param {Object|Function} af after filter, `af(err, msg, session, resp, next)`         
+         * @param {object|Function} af after filter, `af(err, msg, session, resp, next)`         
          */
-        after(af: Object | ((err, msg, session, resp, next) => any)): void;
+        after(af: object | ((err, msg: DIYMsg, session: FrontendSession, resp, next: DIYFunction) => any)): void;
         
         /**
          * add a global filter to before and after global filter
          *
-         * @param {Object} filter provide before and after filter method.
+         * @param {object} filter provide before and after filter method.
          *                        A filter should have two methods: before and after.         
          */
-        globalFilter(filter: Object): void;
+        globalFilter(filter: object): void;
         
         /**
          * Add global before filter.
          *
-         * @param {Object|Function} bf before fileter, bf(msg, session, next)         
+         * @param {object|Function} bf before fileter, bf(msg, session, next)         
          */
-        globalBefore(bf: Object | ((msg, session, next) => any)): void;
+        globalBefore(bf: object | ((msg: DIYMsg, session: FrontendSession, next: DIYFunction) => any)): void;
         
         /**
          * Add global after filter.
          *
-         * @param {Object|Function} af after filter, `af(err, msg, session, resp, next)`         
+         * @param {object|Function} af after filter, `af(err, msg, session, resp, next)`         
          */
-        globalAfter(af: Object | ((err, msg, session, resp, next) => any)): void;
+        globalAfter(af: object | ((err, msg: DIYMsg, session: FrontendSession, resp, next: DIYFunction) => any)): void;
         
         /**
          * Add rpc before filter.
          *
-         * @param {Object|Function} bf before fileter, bf(serverId, msg, opts, next)         
+         * @param {object|Function} bf before fileter, bf(serverId, msg, opts, next)         
          */
-        rpcBefore(bf: Object | ((serverId, msg, opts, next) => any)): void;
+        rpcBefore(bf: object | ((serverId: string, msg: DIYMsg, opts, next: DIYFunction) => any)): void;
         
         /**
          * Add rpc after filter.
          *
-         * @param {Object|Function} af after filter, `af(serverId, msg, opts, next)`         
+         * @param {object|Function} af after filter, `af(serverId, msg, opts, next)`         
          */
-        rpcAfter(af: Object | ((serverId, msg, opts, next) => any)): void;
+        rpcAfter(af: object | ((serverId, msg: DIYMsg, opts, next: DIYFunction) => any)): void;
         
         /**
          * add a rpc filter to before and after rpc filter
          *
-         * @param {Object} filter provide before and after filter method.
+         * @param {object} filter provide before and after filter method.
          *                        A filter should have two methods: before and after.         
          */
-        rpcFilter(filter: Object): void;
+        rpcFilter(filter: object): void;
         
         /**
          * Load component
          *
          * @param  {string} name    (optional) name of the component
-         * @param  {Object} component component instance or factory function of the component
+         * @param  {object} component component instance or factory function of the component
          * @param  {[type]} opts    (optional) construct parameters for the factory function
-         * @return {Object}     app instance for chain invoke         
+         * @return {object}     app instance for chain invoke         
          */
-        load(name: string, component: Object, opts?: any): Object;
+        load(name: string, component: DIYComponent, opts?: any): object;
         
         /**
          * Load component
          *         
-         * @param  {Object} component component instance or factory function of the component
+         * @param  {object} component component instance or factory function of the component
          * @param  {[type]} opts    (optional) construct parameters for the factory function
-         * @return {Object}     app instance for chain invoke         
+         * @return {object}     app instance for chain invoke         
          */        
-        load(component: Object, opts?: any): Object;
+        load(component: object, opts?: any): object;
         
         /**
          * Load Configure json file to settings.
@@ -125,9 +135,9 @@ declare module pomelo {
          *
          * @param  {string} serverType server type string
          * @param  {Function} routeFunc  route function. routeFunc(session, msg, app, cb)
-         * @return {Object}     current application instance for chain invoking         
+         * @return {object}     current application instance for chain invoking         
          */
-        route(kserverTypeey: string, routeFunc: (session, msg, app, cb) => any): Object;     
+        route(kserverTypeey: string, routeFunc: (session: FrontendSession, msg: DIYMsg, app: Application, cb: DIYCallBack) => any): object;     
         
         /**
          * Set before stop function. It would perform before servers stop.
@@ -287,41 +297,41 @@ declare module pomelo {
          * Register admin modules. Admin modules is the extends point of the monitor system.
          *
          * @param {string} moduleId (optional) module id or provoided by module.moduleId
-         * @param {Object} module module object or factory function for module
-         * @param {Object} opts construct parameter for module         
+         * @param {object} module module object or factory function for module
+         * @param {object} opts construct parameter for module         
          */
-        registerAdmin(moduleId: string, module: Object, opts: Object): void;
+        registerAdmin(moduleId: string, module: object, opts: object): void;
         
         /**
          * Use plugin.
          *
-         * @param  {Object} plugin plugin instance
+         * @param  {object} plugin plugin instance
          * @param  {[type]} opts    (optional) construct parameters for the factory function         
          */
-        use(plugin: Object, opts?: any): void;
+        use(plugin: object, opts?: any): void;
         
         /**
          * Application transaction. Transcation includes conditions and handlers, if conditions are satisfied, handlers would be executed.
          * And you can set retry times to execute handlers. The transaction log is in file logs/transaction.log.
          *
          * @param {string} name transaction name
-         * @param {Object} conditions functions which are called before transaction
-         * @param {Object} handlers functions which are called during transaction
+         * @param {object} conditions functions which are called before transaction
+         * @param {object} handlers functions which are called during transaction
          * @param {number} retry retry times to execute handlers if conditions are successfully executed
          */
-        transaction(name: string, conditions: Object, handlers: Object, retry: number): void;
+        transaction(name: string, conditions: object, handlers: object, retry: number): void;
         
         /**
          * Get master server info.
          *
-         * @return {Object} master server info, {id, host, port} 
+         * @return {object} master server info, {id, host, port} 
          */
         getMaster(): MasterInfo;
         
         /**
          * Get current server info.
          *
-         * @return {Object} current server info, {id, serverType, host, port}         
+         * @return {object} current server info, {id, serverType, host, port}         
          */
         getCurServer(): ServerInfo;
         
@@ -342,16 +352,16 @@ declare module pomelo {
         /**
          * Get all the current server infos.
          *
-         * @return {Object} server info map, key: server id, value: server info         
+         * @return {object} server info map, key: server id, value: server info         
          */
-        getServers(): Object;
+        getServers(): object;
         
         /**
          * Get all server infos from servers.json.
          *
-         * @return {Object} server info map, key: server id, value: server info         
+         * @return {object} server info map, key: server id, value: server info         
          */
-        getServersFromConfig(): Object;
+        getServersFromConfig(): object;
         
         /**
          * Get all the server type.
@@ -364,7 +374,7 @@ declare module pomelo {
          * Get server info by server id from current server cluster.
          *
          * @param  {string} serverId server id
-         * @return {Object} server info or undefined
+         * @return {object} server info or undefined
          */
         getServerById(serverId: string): ServerInfo;
         
@@ -372,7 +382,7 @@ declare module pomelo {
          * Get server info by server id from servers.json.
          *
          * @param  {string} serverId server id
-         * @return {Object} server info or undefined         
+         * @return {object} server info or undefined         
          */
         getServerFromConfig(serverId: string): ServerInfo;
         
@@ -426,9 +436,9 @@ declare module pomelo {
         /**
          * Replace server info from current application at runtime.
          *
-         * @param  {Object} servers id map
+         * @param  {object} servers id map
          */
-        replaceServers(servers: Object): void;
+        replaceServers(servers: object): void;
         
         /**
          * Add crons from current application at runtime.
@@ -444,7 +454,14 @@ declare module pomelo {
          */
         removeCrons(crons: any): void;  
         
-        rpc: any;        
+        rpc: { [serverId: string]: 
+            { [remoteFilename: string]: 
+                { [funcName: string]: 
+                    (session: FrontendSession, msg: DIYMsg, DIYCallBack) => any
+                } 
+            } 
+        };
+        sysrpc: any;   
         backendSessionService: BackendSessionService;
         sessionService: SessionService;     
     }   
@@ -455,7 +472,7 @@ declare module pomelo {
      * BackendSessionService would be created in each server process and maintains backend sessions for current process and communicates with the relative frontend servers.
      * BackendSessionService instance could be accessed by app.get('backendSessionService') or app.backendSessionService.
      */
-    export class BackendSessionService {
+    export interface BackendSessionService {
         /**
          * Get backend session by frontend server id and session id.
          *
@@ -491,7 +508,7 @@ declare module pomelo {
          * @param  {string}          reason     kick reason
          * @param  {Function}        cb         callback function
          */
-        kickByUid(frontendId: string, uid: string, reason: string, cb: Function): void;                
+        kickByUid(frontendId: string, uid: string, reason: string, cb: Function): void;  
     }
     
     /**
@@ -503,7 +520,7 @@ declare module pomelo {
      * Any push would overwrite the last push of the same key silently and the changes would be saw in next request. 
      * And you have to make sure the transaction outside if you would push the session concurrently in different processes.
      */
-    export class BackendSession {
+    export interface BackendSession {
         
         /**
          * Bind current session with the user id. It would push the uid to frontend
@@ -527,17 +544,17 @@ declare module pomelo {
          * Set the key/value into backend session.
          *
          * @param {string} key   key
-         * @param {Object} value value
+         * @param {object} value value
          */
-        set(key: string, value: Object): void;
+        set(key: string, value: object): void;
         
         /**
          * Get the value from backend session by key.
          *
          * @param  {string} key key
-         * @return {Object}     value
+         * @return {object}     value
          */
-        get(key: string): Object;
+        get(key: string): object;
         
         /**
          * Push the key/value in backend session to the front internal session.
@@ -553,6 +570,11 @@ declare module pomelo {
          * @param  {Function} cb callback function
          */
         pushAll(cb: Function): void;
+
+        id: string;
+        frontendId: string;
+        uid: string;
+        settings: object;
     }
     
     /**
@@ -560,7 +582,7 @@ declare module pomelo {
      * Create and maintain channels for server local.
      * ChannelService is created by channel component which is a default loaded component of pomelo and channel service would be accessed by app.get('channelService').
      */
-    export class ChannelService {     
+    export interface ChannelService {     
         
         /**
          * Create channel with name.
@@ -591,32 +613,32 @@ declare module pomelo {
          * Group the uids by group. ignore any uid if sid not specified.
          *
          * @param {string} route message route
-         * @param {Object} msg message that would be sent to client
+         * @param {object} msg message that would be sent to client
          * @param {Array} uids the receiver info list, [{uid: userId, sid: frontendServerId}]
-         * @param {Object} opts user-defined push options, optional 
+         * @param {object} opts user-defined push options, optional 
          * @param {Function} cb cb(err)
          */
-        pushMessageByUids(route: string, msg: any, uids: any, opts?: Object, cb?: (err) => void): void;
+        pushMessageByUids(route: string, msg: any, uids: any, opts?: object, cb?: (err) => void): void;
         
         /**
          * Broadcast message to all the connected clients.
          *
          * @param  {string}   stype      frontend server type string
          * @param  {string}   route      route string
-         * @param  {Object}   msg        message
-         * @param  {Object}   opts       user-defined broadcast options, optional
+         * @param  {object}   msg        message
+         * @param  {object}   opts       user-defined broadcast options, optional
          *                               opts.binded: push to binded sessions or all the sessions
          *                               opts.filterParam: parameters for broadcast filter.
          * @param  {Function} cb         callback
          */
-        broadcast(stype: string, route: string, msg: any, opts?: Object, cb?: Function): void;
+        broadcast(stype: string, route: string, msg: any, opts?: object, cb?: Function): void;
     }
     
     /**
      * Channel
      * Channel maintains the receiver collection for a subject. You can add users into a channel and then broadcast message to them by channel.
      */
-    export class Channel {
+    export interface Channel {
         /**
          * Add user to channel.
          *
@@ -648,9 +670,9 @@ declare module pomelo {
          * Get Member info.
          *
          * @param  {string} uid user id
-         * @return {Object} member info
+         * @return {object} member info
          */
-        getMember(uid: string): Object;
+        getMember(uid: string): object;
         
         /**
          * Destroy channel.
@@ -661,20 +683,20 @@ declare module pomelo {
          * Push message to all the members in the channel
          *
          * @param {string} route message route
-         * @param {Object} msg message that would be sent to client
-         * @param {Object} opts user-defined push options, optional
+         * @param {object} msg message that would be sent to client
+         * @param {object} opts user-defined push options, optional
          * @param {Function} cb callback function
          */
-        pushMessage(route: string, msg: Object, opts?: Object, cb?: Function): void;
+        pushMessage(route: string, msg: object, opts?: object, cb?: Function): void;
         
         /**
          * Push message to all the members in the channel
          *
-         * @param {Object} msg message that would be sent to client
-         * @param {Object} opts user-defined push options, optional
+         * @param {object} msg message that would be sent to client
+         * @param {object} opts user-defined push options, optional
          * @param {Function} cb callback function
          */
-        pushMessage(msg: Object, opts?: Object, cb?: Function): void;
+        pushMessage(msg: object, opts?: object, cb?: Function): void;
     }
     
     /**
@@ -683,7 +705,7 @@ declare module pomelo {
      * Session service is created by session component and is only available in frontend servers. 
      * You can access the service by app.get('sessionService') or app.sessionService in frontend servers.
      */
-    export class SessionService {
+    export interface SessionService {
         
         /**
          * Get sessions by userId.
@@ -719,7 +741,7 @@ declare module pomelo {
      * There is a proxy class called BackendSession in backend servers and FrontendSession 
      * in frontend servers.
      */
-    export class Session {
+    export interface Session {
         
         /**
          * Bind the session with the the uid.
@@ -738,10 +760,10 @@ declare module pomelo {
         /**
          * Set values (one or many) for the session.
          *
-         * @param {string|Object} key session key
-         * @param {Object} value session value
+         * @param {string|object} key session key
+         * @param {object} value session value
          */
-        set(key: string | Object, value: Object);
+        set(key: string | object, value: object);
         
         /**
          * Remove value from the session.
@@ -754,14 +776,14 @@ declare module pomelo {
          * Get value from the session.
          *
          * @param {string} key session key
-         * @return {Object} value associated with session key
+         * @return {object} value associated with session key
          */
         get(key: string): any;
         
         /**
          * Send message to the session.
          *
-         * @param  {Object} msg final message sent to client
+         * @param  {object} msg final message sent to client
          */
         send(msg: any): void;
         
@@ -772,14 +794,23 @@ declare module pomelo {
          */
         sendBatch(msgs: any[]): void;
         
+        id: string;
+        frontendId: string;
+        uid: string;
+        settings: object;
     }
     
     /**
      * Frontend session for frontend server.
      */
-    export class FrontendSession {
+    export interface FrontendSession {
         
+        id: string;
+        frontendId: string;
         uid: string;
+        settings: object;
+        __sessionService__: any;
+        __session__: Session;
         
         /**
          * Bind the session with the the uid.
@@ -800,16 +831,16 @@ declare module pomelo {
         /**
          * Set values (one or many) for the session.
          *
-         * @param {string|Object} key session key
-         * @param {Object} value session value
+         * @param {string|object} key session key
+         * @param {object} value session value
          */
-        set(key: string | Object, value: Object);
+        set(key: string | object, value: object);
         
         /**
          * Get value from the session.
          *
          * @param {string} key session key
-         * @return {Object} value associated with session key
+         * @return {object} value associated with session key
          */
         get(key: string): any;
         
@@ -820,6 +851,13 @@ declare module pomelo {
          * @param {Function} cb callback
          */
         push(key: string, cb: (err: Error) => void): void;
+
+        /**
+         * Push all the key/values in backend session to the frontend internal session.
+         *
+         * @param  {Function} cb callback function
+         */
+        pushAll(cb: Function): void;
         
         /**
          * listener
@@ -833,7 +871,7 @@ declare module pomelo {
     /**
      * master server info
      */
-    export class MasterInfo {
+    export interface MasterInfo {
         id: string;
         host: any;
         port: any;
@@ -842,7 +880,7 @@ declare module pomelo {
     /**
      * ServerInfo
      */
-    export class ServerInfo {
+    export interface ServerInfo {
         id: string;
         serverType: string;
         host: string;
@@ -853,7 +891,7 @@ declare module pomelo {
     /**
      * Connector
      */
-    export class Connector {
+    export interface Connector {
         sioconnector: any;
         hybridconnector: any;
         udpconnector: any;
@@ -863,27 +901,28 @@ declare module pomelo {
     /**
      * PushScheduler
      */
-    export class PushScheduler {
+    export interface PushScheduler {
         direct: any;
         buffer: any;
     }
     
-    let version: any;
-    let events: any;
-    let components: any;
-    let filters: any;
-    let rpcFilters: any;
-    let connectors: Connector;
-    let pushSchedulers: PushScheduler;
+    export let version: any;
+    export let events: any;
+    export let components: any;
+    export let filters: any;
+    export let rpcFilters: any;
+    export let connectors: Connector;
+    export let pushSchedulers: PushScheduler;
+    export let app: Application;
     
     /**
      * Create an pomelo application.
      * 
      * @return {Application} application
      */
-    function createApp(): Application;
+    export function createApp(): Application;
     
-    function timeout(): any;
-}
+    export function timeout(): any;
+// }
 
-export = pomelo;
+// export = pomelo;
